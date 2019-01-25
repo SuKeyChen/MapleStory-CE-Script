@@ -1,0 +1,69 @@
+//Require Familiar Recovers HP & MP:
+//5%HP&MP/10seconds: 39. Stumpy, 69. Cuzco, 90. Firebrand (in Crimsonwood), 10. Candle Monster, 10. Coke Snail, 35. Black Goat, 126. Thanatos
+//10%HP&MP/10seconds: 12. Octopus (in Victoria island), 20. Water Theif Monster (in Edelstein), 20. White Baby Monkey, 25. Genin (in Showa town), 30. Goat (above sea), 36. Jr. Grupin (in Orbis), 40. Paper Lantern Ghost (in Mushroom Shrine), 54. Bloctopus (in Ludibrium), 70. Poison Poopa (in Aqaurium), 74. Platoon Chronos, 85. Rurumo (in Magatia), 90. Firebrand (in Crimsonwood), 135. Afterlord Type A (Neo Tokyo), 40. Clown Monkey (in Ximending), 8. Frog (in Floating Market), 67. Lord Pirate,
+//15%HP&MP/10seconds: 35. Gold Yeti and King Pepe, 92. D. Roy, 99. Mr. Alli, 117. Master Birk, 120. Margana, 58. Papa Pixie, 127. Castle Golem, Ultimate Visitor,
+
+define(Restore_HP,#5000)
+define(Restore_MP,#5000)
+[ENABLE]
+Alloc(GetMP,128)
+Alloc(GetHP,128)
+Alloc(Hook,128)
+Alloc(MP_Value,4)
+Alloc(HP_Value,4)
+Label(Return)
+Label(Restore)
+Label(MPreturn)
+Label(HPreturn)
+
+GetHP:
+mov [HP_Value],esi
+mov [ebx+00000214],esi
+jmp HPreturn
+
+GetMP:
+mov [MP_Value],esi
+mov [edi+00000214],esi
+jmp MPreturn
+
+022E1E6F:// 89 ? ? ? 00 00 8D ? ? ? 00 00 FF ? ? ? 00 00 33 F6 50 E8
+jmp GetHP
+db 90
+HPreturn:
+
+022E248F: //  89 ? ? ? 00 00 50 8D ? ? E8 ? ? ? ? 8B ? ? C7
+jmp GetMP
+nop
+MPreturn:
+
+Hook:
+cmp [HP_Value],Restore_HP
+jl Restore
+cmp [MP_Value],Restore_MP
+jl Restore
+cmp [esi+00000170],eax
+jmp Return
+
+Restore:
+mov [esi+00000170],eax
+jmp Return
+
+// 39 86 ? ? 00 00 7F ? 8B CE E8 [new AOB?]
+0127F5D5: //  39 ?? ? ? 00 00 7F ? 8B CE E8 ? ? ? ? 8B ?? ? ? 00 00 [first]
+jmp Hook
+nop
+Return:
+
+[DISABLE]
+022E1E6F: // Addy that accesses UI HP Value //
+mov [ebx+00000214],esi
+
+022E248F: // Addy that accesses UI MP Value //
+mov [edi+00000214],esi
+
+0127F5D5:
+cmp [esi+00000170],eax
+
+dealloc(Hook)
+dealloc(GetHP)
+dealloc(GetMP)
